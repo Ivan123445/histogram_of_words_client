@@ -3,81 +3,55 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
 
+#include "file_utils/file_utils.h"
 #include "prefix_tree/prefix_tree.h"
 
-#define NUM_THREADS 4
 
-
-char * handle_args(int argc, char *argv[]);
-char* get_file_name_from_console();
-prefix_tree **handle_file_parts_parallel(char *filename, long *file_parts, size_t num_parts);
+#define PORT 12345
+#define SERVER_IP "127.0.0.1"
+#define NUM_PCS 1
 
 
 int main(const int argc, char *argv[]) {
-    struct timespec start, end;
-    double elapsed;
-
     char* fileName = "/home/ivan/CLionProjects/untitled/file.txt";
-    // char* fileName = get_file_name_from_console();
+    // long* file_parts = split_file(fileName, NUM_PCS);
 
-    long* file_parts = split_file(fileName, NUM_THREADS);
+    int client_socket;
+    struct sockaddr_in server_addr;
 
-    clock_gettime(CLOCK_MONOTONIC, &start);
-    prefix_tree **prefix_trees = handle_file_parts_parallel(fileName, file_parts, NUM_THREADS);
-    clock_gettime(CLOCK_MONOTONIC, &end);
-
-    prefix_tree *main_ptree = prefix_tree_init();
-    for (int i = 0; i < NUM_THREADS; i++) {
-        prefix_tree_insert_tree(main_ptree, prefix_trees[i]);
+    // Создаем сокет
+    if ((client_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
     }
 
-    elapsed = (end.tv_sec - start.tv_sec) +
-                 (end.tv_nsec - start.tv_nsec) / 1e9;
-    printf("Time: %f\n", elapsed);
-    printf("Found words:\n");
-    // prefix_tree_print(main_ptree);
+    // Настроим серверный адрес
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(PORT);
+    if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) <= 0) {
+        perror("Invalid server IP address");
+        close(client_socket);
+        exit(EXIT_FAILURE);
+    }
 
-    // free(fileName);
+    // Подключаемся к серверу
+    if (connect(client_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
+        perror("Connection failed");
+        close(client_socket);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Connected to server. Receiving file...\n");
+
+    // Отправляем файл клиенту
+    send_file(client_socket, fileName);
+
+    close(client_socket);
+
     return 0;
 }
 // /home/ivan/CLionProjects/untitled/file.txt
-
-prefix_tree **handle_file_parts_parallel(char *filename, long *file_parts, size_t num_parts) {
-    pthread_t *threads = malloc(sizeof(pthread_t) * num_parts);
-    prefix_tree **prefix_trees = malloc(sizeof(prefix_tree*) * num_parts);
-    thread_args *thread_args_massive = malloc(sizeof(thread_args) * num_parts);
-
-    for (int i = 0; i < num_parts; i++) {
-        thread_args_massive[i].filename = filename;
-        thread_args_massive[i].start = file_parts[i];
-        thread_args_massive[i].end = file_parts[i+1];
-
-        if (pthread_create(&threads[i], NULL, get_prefix_tree_by_text, &thread_args_massive[i]) != 0) {
-            perror("pthread_create");
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    for (int i = 0; i < num_parts; i++) {
-        if (pthread_join(threads[i], (void**)&prefix_trees[i]) != 0) {
-            perror("pthread_join");
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    free(threads);
-    free(thread_args_massive);
-    return prefix_trees;
-}
-
-char* handle_args(int argc, char *argv[]) {
-    return argv[1];
-}
-
-char* get_file_name_from_console() {
-    char* fileName = malloc(256*sizeof(char));
-    printf("Enter file name: ");
-    scanf("%s", fileName);
-    return fileName;
-}
