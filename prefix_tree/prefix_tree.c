@@ -101,13 +101,11 @@ void *get_prefix_tree_by_text(void *arg) {
     return ptree;
 }
 
-
-
-
-
-
-
-
-
-
-
+void prefix_tree_destroy(prefix_tree *ptree) {
+    for (int i = 0; i < ALPHABET_SIZE; i++) {
+        if (ptree->children[i] != 0) {
+            prefix_tree_destroy(ptree->children[i]);
+        }
+    }
+    free(ptree);
+}

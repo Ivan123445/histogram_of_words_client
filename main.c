@@ -59,6 +59,7 @@ prefix_tree *handle_file_parts_parallel(char *filename, long *file_parts, size_t
     prefix_tree *main_ptree = prefix_tree_init();
     for (int i = 0; i < num_pcs; i++) {
         prefix_tree_insert_tree(main_ptree, prefix_trees[i]);
+        prefix_tree_destroy(prefix_trees[i]);
     }
 
     free(threads);
@@ -105,5 +106,7 @@ int main(const int argc, char *argv[]) {
     printf("Result tree:\n");
     prefix_tree_print(result_tree);
 
+    free(file_parts);
+    prefix_tree_destroy(result_tree);
     return 0;
 }

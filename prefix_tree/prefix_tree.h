@@ -31,6 +31,7 @@ void *get_prefix_tree_by_text(void *arg);
 void prefix_tree_insert_word_with_col_words(prefix_tree *parent, const char *word, const size_t words_here);
 void prefix_tree_insert_tree(prefix_tree *parent, prefix_tree *child);
 void prefix_tree_print(const prefix_tree *ptree);
+void prefix_tree_destroy(prefix_tree *ptree);
 
 
 #endif // PREFIX_TREE_H
