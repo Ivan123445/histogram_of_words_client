@@ -27,7 +27,7 @@ long* split_file(char* filename, size_t col_parts) {
     FILE* file = fopen(filename, "r");
     if (!file) {
         perror("Не удалось открыть файл");
-        return NULL;
+        exit(EXIT_FAILURE);
     }
 
     // Определяем размер файла
