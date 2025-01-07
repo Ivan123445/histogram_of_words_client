@@ -94,9 +94,8 @@ void *get_prefix_tree_by_text(void *arg) {
     fseek(file, start, SEEK_SET);
 
     prefix_tree *ptree = prefix_tree_init();
-    char buffer[BUFFER_SIZE] = {0};
-    int i = 0;
-    while (ftell(file) < end - 1 && get_word(file, buffer, BUFFER_SIZE) == 1) {
+    char buffer[MAX_WORD_LENGTH] = {0};
+    while (ftell(file) < end - 1 && get_word(file, buffer, MAX_WORD_LENGTH) == 1) {
         prefix_tree_insert_word(ptree, buffer);
     }
     return ptree;

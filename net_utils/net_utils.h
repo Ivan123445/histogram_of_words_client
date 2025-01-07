@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/select.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <errno.h>
@@ -18,7 +20,7 @@
 #define NUM_PCS 1
 
 #define BROADCAST_PORT 9876
-#define BUFFER_SIZE 1024
+#define NET_BUFFER_SIZE 1024
 
 struct __attribute__((packed)) ptree_word {
     char word[MAX_WORD_LENGTH];

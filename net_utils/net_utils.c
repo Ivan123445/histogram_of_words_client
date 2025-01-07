@@ -4,7 +4,7 @@
 void find_servers(char server_ips[][INET_ADDRSTRLEN], int *server_count) {
     int sock;
     struct sockaddr_in broadcast_addr;
-    char buffer[BUFFER_SIZE];
+    char buffer[NET_BUFFER_SIZE];
     fd_set read_fds;
     struct timeval timeout;
 
@@ -41,7 +41,7 @@ void find_servers(char server_ips[][INET_ADDRSTRLEN], int *server_count) {
     while (select(sock + 1, &read_fds, NULL, NULL, &timeout) > 0) {
         struct sockaddr_in server_addr;
         socklen_t addr_len = sizeof(server_addr);
-        ssize_t received = recvfrom(sock, buffer, BUFFER_SIZE - 1, 0, (struct sockaddr *)&server_addr, &addr_len);
+        ssize_t received = recvfrom(sock, buffer, NET_BUFFER_SIZE - 1, 0, (struct sockaddr *)&server_addr, &addr_len);
 
         if (received < 0) {
             perror("Error receiving response");

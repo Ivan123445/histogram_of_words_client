@@ -73,35 +73,31 @@ void get_filename_from_console(char *filename) {
 }
 
 void get_filename_from_arguments(const int argc, char *argv[], char *filename) {
-    if (argc == 1 && strcmp(argv[0], "--help") == 0) {
+    if (argc == 2 && strcmp(argv[1], "--help") == 0) {
         printf("Usage: --file <filename>\n");
         exit(0);
     }
-    if (argc != 2) {
+    if (strcmp(argv[1], "--file") != 0) {
+        printf("Wrong flag\n");
+        printf("For more info use --help\n");
+        exit(EXIT_FAILURE);
+    }
+    if (argc != 3) {
         printf("Wrong number of arguments\n");
         printf("For more info use --help\n");
         exit(EXIT_FAILURE);
     }
 
-    if (strcmp(argv[0], "--file") != 0) {
-        printf("Wrong flag\n");
-        printf("For more info use --help\n");
-        exit(EXIT_FAILURE);
-    }
-
-    strcpy(filename, argv[1]);
+    strcpy(filename, argv[2]);
 }
 
 int main(const int argc, char *argv[]) {
     char fileName[MAX_FILENAME_LEN];
-    argc > 0 ? get_filename_from_arguments(argc, argv, fileName) : get_filename_from_console(fileName);
+    argc > 1 ? get_filename_from_arguments(argc, argv, fileName) : get_filename_from_console(fileName);
 
     char server_ips[MAX_PCS][INET_ADDRSTRLEN];
     int server_count;
     find_servers(server_ips, &server_count);
-
-    // char* fileName = "/home/ivan/CLionProjects/histogram_of_words_client/file.txt";
-    // char* fileName = "/home/ivan/CLionProjects/histogram_of_words_client/file_short.txt";
 
     long *file_parts = split_file(fileName, server_count);
 
