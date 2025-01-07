@@ -9,4 +9,6 @@ add_executable(untitled main.c
         prefix_tree/prefix_tree.h
         prefix_tree/prefix_tree.c
         file_scanner/file_scaner.c
-        file_scanner/file_scaner.h)
+        file_scanner/file_scaner.h
+        net_utils/net_utils.c
+        net_utils/net_utils.h)

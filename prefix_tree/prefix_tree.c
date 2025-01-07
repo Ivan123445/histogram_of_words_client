@@ -32,8 +32,11 @@ void prefix_tree_insert_word(prefix_tree *parent, const char *word) {
     prefix_tree_insert_word_with_col_words(parent, word, 1);
 }
 
-void prefix_tree_insert_tree_recursive(prefix_tree* parent, const prefix_tree *child, char *buffer, const size_t depth) {
-    buffer[depth] = child->character;
+void prefix_tree_insert_tree_recursive(prefix_tree* parent, const prefix_tree *child, char *buffer, long depth) {
+    if (depth >= 0) {
+        buffer[depth] = child->character;
+    }
+
     if (child->words_here) {
         buffer[depth + 1] = '\0';
         prefix_tree_insert_word_with_col_words(parent, buffer, child->words_here);
@@ -54,7 +57,7 @@ void prefix_tree_insert_tree(prefix_tree *parent, prefix_tree *child) {
     free(buffer);
 }
 
-void prefix_tree_print_recursive(const prefix_tree *tree, char *buffer, const size_t depth) {
+void prefix_tree_print_recursive(const prefix_tree *tree, char *buffer, long depth) {
     buffer[depth] = tree->character;
     if (tree->words_here) {
         buffer[depth + 1] = '\0';
