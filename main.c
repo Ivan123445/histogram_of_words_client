@@ -69,7 +69,7 @@ prefix_tree *handle_file_parts_parallel(char *filename, long *file_parts, size_t
 
 void get_filename_from_arguments(const int argc, char *argv[], char *filename) {
     if (argc == 2 && strcmp(argv[1], "--help") == 0) {
-        printf("Usage: --file <filename>\n");
+        printf("Usage: --file <filename> or enter words via stdin\n");
         exit(0);
     }
     if (strcmp(argv[1], "--file") != 0) {
