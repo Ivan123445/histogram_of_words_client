@@ -11,7 +11,6 @@
 #include "file_utils/file_utils.h"
 #include "prefix_tree/prefix_tree.h"
 
-#define MAX_FILENAME_LEN 256
 #define MAX_PCS 10
 
 struct handle_file_args {
@@ -68,11 +67,6 @@ prefix_tree *handle_file_parts_parallel(char *filename, long *file_parts, size_t
     return main_ptree;
 }
 
-void get_filename_from_console(char *filename) {
-    printf("Enter filename:");
-    scanf("%s", filename);
-}
-
 void get_filename_from_arguments(const int argc, char *argv[], char *filename) {
     if (argc == 2 && strcmp(argv[1], "--help") == 0) {
         printf("Usage: --file <filename>\n");
@@ -93,8 +87,8 @@ void get_filename_from_arguments(const int argc, char *argv[], char *filename) {
 }
 
 int main(const int argc, char *argv[]) {
-    char fileName[MAX_FILENAME_LEN];
-    argc > 1 ? get_filename_from_arguments(argc, argv, fileName) : get_filename_from_console(fileName);
+    char fileName[MAX_FILENAME_LEN] = {0};
+    argc > 1 ? get_filename_from_arguments(argc, argv, fileName) : write_file_from_console(fileName);
 
     char server_ips[MAX_PCS][INET_ADDRSTRLEN];
     int server_count;
