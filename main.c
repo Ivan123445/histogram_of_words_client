@@ -91,9 +91,8 @@ int main(const int argc, char *argv[]) {
     char server_ips[MAX_PCS][INET_ADDRSTRLEN];
     int server_count;
     find_servers(server_ips, &server_count);
-    printf("Splitting file..\n");
+    printf("Found %d servers\n", server_count);
     long *file_parts = split_file(fileName, server_count);
-
     printf("File splitted\n");
     prefix_tree *result_tree = handle_file_parts_parallel(fileName, file_parts, server_count, server_ips);
     printf("Result tree:\n");

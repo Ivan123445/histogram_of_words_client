@@ -27,7 +27,7 @@ void find_servers(char server_ips[][INET_ADDRSTRLEN], int *server_count) {
         exit(EXIT_FAILURE);
     }
 
-    printf("Broadcast message sent. Waiting for responses...\n");
+    // printf("Broadcast message sent. Waiting for responses...\n");
 
     FD_ZERO(&read_fds);
     FD_SET(sock, &read_fds);
@@ -62,7 +62,6 @@ void find_servers(char server_ips[][INET_ADDRSTRLEN], int *server_count) {
 
         break;
     }
-
     close(sock);
 }
 

@@ -21,16 +21,16 @@ void write_file_from_console(char *filename) {
 
     FILE *file = fopen(filename, "w");
     if (file == NULL) {
-        perror("Ошибка открытия файла");
+        perror("File opening errorS");
         exit(EXIT_FAILURE);
     }
 
-    printf("Введите текст. Для завершения введите строку \"STOP\":\n");
+    printf("Enter the text. To complete, enter the line \"STOP\":\n");
 
     char buffer[1024];
     while (1) {
         if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
-            perror("Ошибка ввода");
+            perror("Input error");
             fclose(file);
             exit(EXIT_FAILURE);
         }
@@ -40,18 +40,18 @@ void write_file_from_console(char *filename) {
         }
 
         if (fputs(buffer, file) == EOF) {
-            perror("Ошибка записи в файл");
+            perror("Error writing to a file");
             fclose(file);
             exit(EXIT_FAILURE);
         }
     }
 
     if (fclose(file) == EOF) {
-        perror("Ошибка закрытия файла");
+        perror("File closing error");
         exit(EXIT_FAILURE);
     }
 
-    printf("Текст успешно записан!\n");
+    printf("The text has been recorded successfully!\n");
 }
 
 void send_file(int client_socket, const char *filename, long start, long end) {
