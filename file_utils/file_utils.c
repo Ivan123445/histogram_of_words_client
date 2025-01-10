@@ -106,3 +106,57 @@ void send_file(int client_socket, const char *filename, long start, long end) {
     fclose(file);
 }
 
+void write_file(char *input_filename, char *output_filename, long start, long end) {
+    if (start < 0 || end < 0 || start > end) {
+        fprintf(stderr, "Error: invalid range (start: %ld, end: %ld)\n", start, end);
+        return;
+    }
+
+    FILE *input_file = fopen(input_filename, "rb");
+    if (!input_file) {
+        perror("Error opening input file");
+        return;
+    }
+
+    FILE *output_file = fopen(output_filename, "wb");
+    if (!output_file) {
+        perror("Error opening output file");
+        fclose(input_file);
+        return;
+    }
+
+    if (fseek(input_file, start, SEEK_SET) != 0) {
+        perror("Error seeking in input file");
+        fclose(input_file);
+        fclose(output_file);
+        return;
+    }
+
+    size_t bytes_to_copy = end - start;
+    char buffer[1024];
+    size_t bytes_read, bytes_written;
+
+    while (bytes_to_copy > 0) {
+        size_t chunk_size = (bytes_to_copy < sizeof(buffer)) ? bytes_to_copy : sizeof(buffer);
+        bytes_read = fread(buffer, 1, chunk_size, input_file);
+
+        if (bytes_read == 0) {
+            if (ferror(input_file)) {
+                perror("Error reading input file");
+            }
+            break;
+        }
+
+        bytes_written = fwrite(buffer, 1, bytes_read, output_file);
+        if (bytes_written != bytes_read) {
+            perror("Error writing to output file");
+            break;
+        }
+
+        bytes_to_copy -= bytes_read;
+    }
+
+    fclose(input_file);
+    fclose(output_file);
+}
+

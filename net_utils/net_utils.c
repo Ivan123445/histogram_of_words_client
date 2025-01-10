@@ -4,7 +4,6 @@
 void find_servers(char server_ips[][INET_ADDRSTRLEN], int *server_count) {
     int sock;
     struct sockaddr_in broadcast_addr;
-    char buffer[NET_BUFFER_SIZE];
     fd_set read_fds;
     struct timeval timeout;
 
@@ -41,18 +40,26 @@ void find_servers(char server_ips[][INET_ADDRSTRLEN], int *server_count) {
     while (select(sock + 1, &read_fds, NULL, NULL, &timeout) > 0) {
         struct sockaddr_in server_addr;
         socklen_t addr_len = sizeof(server_addr);
-        ssize_t received = recvfrom(sock, buffer, NET_BUFFER_SIZE - 1, 0, (struct sockaddr *)&server_addr, &addr_len);
+        char buffer[MAX_PCS * INET_ADDRSTRLEN + 1];
+        ssize_t received = recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr *)&server_addr, &addr_len);
 
         if (received < 0) {
             perror("Error receiving response");
             continue;
         }
 
+
+        // printf("Buffer: ");
+        // printf(buffer);
+        // char ip[INET_ADDRSTRLEN];
+        // while (())
+
         buffer[received] = '\0';
         printf("Received response: %s from %s\n", buffer, inet_ntoa(server_addr.sin_addr));
 
         strncpy(server_ips[*server_count], inet_ntoa(server_addr.sin_addr), INET_ADDRSTRLEN);
         (*server_count)++;
+        break;
     }
 
     close(sock);
@@ -87,12 +94,15 @@ void receive_ptree(prefix_tree *main_tree, int server_socket) {
     struct ptree_word pword_buffer;
     ssize_t bytes_received;
 
-    while ((bytes_received = recv(server_socket, (char*)&pword_buffer, sizeof(pword_buffer), 0)) > 0) {
-        pword_buffer.col_words = ntohl(pword_buffer.col_words);
+    while ((bytes_received = recv(server_socket, &pword_buffer, sizeof(pword_buffer), 0)) > 0) {
+        pword_buffer.col_words = ntohs(pword_buffer.col_words);
         prefix_tree_insert_word_with_col_words(main_tree, pword_buffer.word, pword_buffer.col_words);
+        memset(&pword_buffer, 0, sizeof(pword_buffer));
     }
 
     if (bytes_received == -1) {
         perror("Receive failed");
+        close(server_socket);
+        exit(EXIT_FAILURE);
     }
 }

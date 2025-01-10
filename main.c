@@ -11,8 +11,6 @@
 #include "file_utils/file_utils.h"
 #include "prefix_tree/prefix_tree.h"
 
-#define MAX_PCS 10
-
 struct handle_file_args {
     char *filename;
     char *server_ip;
@@ -93,9 +91,10 @@ int main(const int argc, char *argv[]) {
     char server_ips[MAX_PCS][INET_ADDRSTRLEN];
     int server_count;
     find_servers(server_ips, &server_count);
-
+    printf("Splitting file..\n");
     long *file_parts = split_file(fileName, server_count);
 
+    printf("File spritted\n");
     prefix_tree *result_tree = handle_file_parts_parallel(fileName, file_parts, server_count, server_ips);
     printf("Result tree:\n");
     prefix_tree_print(result_tree);

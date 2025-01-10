@@ -9,14 +9,13 @@
 #include <unistd.h>
 #include "../file_scanner/file_scaner.h"
 
-#define MAX_WORD_LENGTH 256
-#define ALPHABET_SIZE 1024
+#define MAX_WORD_LENGTH 20
+#define ALPHABET_SIZE 125
 
 typedef struct prefix_tree {
-    struct prefix_tree *root;
     struct prefix_tree *children[ALPHABET_SIZE];
     char character;
-    size_t words_here;
+    unsigned short words_here;
 } prefix_tree;
 
 typedef struct {

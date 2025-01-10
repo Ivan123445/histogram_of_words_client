@@ -17,14 +17,13 @@
 
 #define PORT 12346
 #define SERVER_IP "127.0.0.1"
-#define NUM_PCS 1
-
+#define MAX_PCS 10
 #define BROADCAST_PORT 9876
 #define NET_BUFFER_SIZE 1024
 
 struct __attribute__((packed)) ptree_word {
     char word[MAX_WORD_LENGTH];
-    int col_words;
+    unsigned short col_words;
 };
 
 

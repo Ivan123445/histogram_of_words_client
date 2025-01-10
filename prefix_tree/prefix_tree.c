@@ -3,7 +3,6 @@
 
 prefix_tree *prefix_tree_init() {
     prefix_tree *ptree = malloc(sizeof(prefix_tree));
-    ptree->root = NULL;
     memset(ptree->children, 0, sizeof(prefix_tree*)*ALPHABET_SIZE);
     ptree->words_here = false;
     ptree->character = 0;
@@ -11,9 +10,8 @@ prefix_tree *prefix_tree_init() {
 }
 
 void prefix_tree_insert_word_with_col_words(prefix_tree *parent, const char *word, const size_t words_here) {
-    for (size_t i = 0; i < 100000; i++) {}
     prefix_tree *cur_node = parent;
-    for (;*word != '\0' && *word != ' '; ++word) {
+    for (;*word != '\0' && *word != ' ' && *word != '.' && *word != ','; ++word) {
         unsigned char ch = *word;
         if (cur_node->children[ch] != 0) {
             cur_node = cur_node->children[ch];
@@ -21,6 +19,7 @@ void prefix_tree_insert_word_with_col_words(prefix_tree *parent, const char *wor
             prefix_tree *tmp = malloc(sizeof(prefix_tree));
             cur_node->children[ch] = tmp;
             tmp->character = *word;
+            tmp->words_here = 0;
             memset(tmp->children, 0, sizeof(prefix_tree*)*ALPHABET_SIZE);
             cur_node = tmp;
         }
@@ -62,7 +61,7 @@ void prefix_tree_print_recursive(const prefix_tree *tree, char *buffer, long dep
     if (tree->words_here) {
         buffer[depth + 1] = '\0';
         printf("%s", buffer);
-        printf(": %lu\n", tree->words_here);
+        printf(": %d\n", tree->words_here);
     }
     for (size_t i = 0; i < ALPHABET_SIZE; i++) {
         if (tree->children[i] != 0) {
