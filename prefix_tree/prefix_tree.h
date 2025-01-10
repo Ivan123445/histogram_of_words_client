@@ -14,7 +14,7 @@
 typedef struct prefix_tree {
     struct prefix_tree **childrens;
     char character;
-    unsigned short col_children;
+    unsigned char col_children;
     unsigned short words_here;
 } prefix_tree;
 
