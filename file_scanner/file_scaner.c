@@ -37,7 +37,7 @@ long* split_file(char* filename, size_t col_parts) {
 
     // Вычисляем приблизительный размер каждой части
     long part_size = file_size / col_parts;
-    long *part_offsets = malloc(col_parts * sizeof(long));
+    long *part_offsets = malloc((col_parts+1) * sizeof(long));
     if (part_offsets == NULL) {
         perror("Ошибка при выделении памяти");
         fclose(file);

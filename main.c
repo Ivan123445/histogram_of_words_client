@@ -35,10 +35,10 @@ prefix_tree *handle_file_parts_parallel(char *filename, long *file_parts, size_t
     struct handle_file_args *args = malloc(sizeof(struct handle_file_args) * num_pcs);
 
     for (int i = 0; i < num_pcs; i++) {
-        args->filename = filename;
-        args->server_ip = server_ips[i];
-        args->file_start = file_parts[i];
-        args->file_end = file_parts[i+1];
+        args[i].filename = filename;
+        args[i].server_ip = server_ips[i];
+        args[i].file_start = file_parts[i];
+        args[i].file_end = file_parts[i+1];
 
         if (pthread_create(&threads[i], NULL, handle_file_part, &args[i]) != 0) {
             perror("pthread_create");
@@ -89,8 +89,12 @@ int main(const int argc, char *argv[]) {
     argc > 1 ? get_filename_from_arguments(argc, argv, fileName) : write_file_from_console(fileName);
 
     char server_ips[MAX_PCS][INET_ADDRSTRLEN];
-    int server_count;
+    int server_count = 0;
     find_servers(server_ips, &server_count);
+    if (server_count == 0) {
+        printf("No servers found\n");
+        exit(EXIT_FAILURE);
+    }
     printf("Found %d servers\n", server_count);
     long *file_parts = split_file(fileName, server_count);
     printf("File splitted\n");

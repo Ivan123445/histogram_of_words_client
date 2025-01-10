@@ -78,7 +78,7 @@ void send_file(int client_socket, const char *filename, long start, long end) {
 
     char buffer[1024];
     size_t bytes_to_read;
-    long bytes_remaining = end - start + 1;
+    long bytes_remaining = end - start;
     send(client_socket, (char *)&bytes_remaining, sizeof(bytes_remaining), 0);
 
     while (bytes_remaining > 0) {
@@ -160,3 +160,49 @@ void write_file(char *input_filename, char *output_filename, long start, long en
     fclose(output_file);
 }
 
+void print_file_part(char *input_filename, long start, long end) {
+    if (start < 0 || end < 0 || start > end) {
+        fprintf(stderr, "Error: invalid range (start: %ld, end: %ld)\n", start, end);
+        return;
+    }
+
+    FILE *input_file = fopen(input_filename, "rb");
+    if (!input_file) {
+        perror("Error opening input file");
+        return;
+    }
+
+    if (fseek(input_file, start, SEEK_SET) != 0) {
+        perror("Error seeking in input file");
+        fclose(input_file);
+        return;
+    }
+
+    size_t bytes_to_copy = end - start;
+    char buffer[1024];
+    size_t bytes_read;
+
+    while (bytes_to_copy > 0) {
+        size_t chunk_size = (bytes_to_copy < sizeof(buffer)) ? bytes_to_copy : sizeof(buffer);
+        bytes_read = fread(buffer, 1, chunk_size, input_file);
+
+        if (bytes_read == 0) {
+            if (ferror(input_file)) {
+                perror("Error reading input file");
+            }
+            break;
+        }
+
+        printf("%s", buffer);
+
+        bytes_to_copy -= bytes_read;
+    }
+    fclose(input_file);
+}
+
+void print_file_parts(char *filename, long *file_parts, int num_threads) {
+    for (int i = 0; i < num_threads; i++) {
+        printf("Part %d: \n", i);
+        print_file_part(filename, file_parts[i], file_parts[i + 1]);
+    }
+}

@@ -6,6 +6,7 @@ void find_servers(char server_ips[][INET_ADDRSTRLEN], int *server_count) {
     struct sockaddr_in broadcast_addr;
     fd_set read_fds;
     struct timeval timeout;
+    *server_count = 0;
 
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
@@ -47,16 +48,17 @@ void find_servers(char server_ips[][INET_ADDRSTRLEN], int *server_count) {
         }
 
         *server_count = 0;
-        for (int i = 0; i < sizeof(buffer); i++) {
+        for (int i = 0, j = 0; i < sizeof(buffer); i++, j++) {
             if (buffer[i] == '|') {
                 if (i > 0) {
                     (*server_count)++;
+                    j = -1;
                 }
                 if (buffer[i + 1] == '|') {
                     break;
                 }
             } else {
-                server_ips[(*server_count)][i] = buffer[i];
+                server_ips[(*server_count)][j] = buffer[i];
             }
         }
 
