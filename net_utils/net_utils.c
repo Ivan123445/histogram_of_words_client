@@ -66,13 +66,11 @@ void find_servers(char server_ips[][INET_ADDRSTRLEN], int *server_count) {
 }
 
 void get_connection(int *client_socket, const char *ip) {
-    // Создаем сокет
     if ((*client_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
         perror("Socket creation failed");
         exit(EXIT_FAILURE);
     }
 
-    // Настроим серверный адрес
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(PORT);
@@ -82,7 +80,6 @@ void get_connection(int *client_socket, const char *ip) {
         exit(EXIT_FAILURE);
     }
 
-    // Подключаемся к серверу
     if (connect(*client_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
         perror("Connection failed");
         close(*client_socket);
@@ -90,11 +87,30 @@ void get_connection(int *client_socket, const char *ip) {
     }
 }
 
+ssize_t recv_all(int sock, void *buffer, size_t length) {
+    size_t total_received = 0;
+    char *ptr = buffer;
+
+    while (total_received < length) {
+        ssize_t received = recv(sock, ptr + total_received, length - total_received, 0);
+        if (received < 0) {
+            perror("recv");
+            return -1;
+        }
+        if (received == 0) {
+            break;
+        }
+        total_received += received;
+    }
+
+    return total_received;
+}
+
 void receive_ptree(prefix_tree *main_tree, int server_socket) {
     struct ptree_word pword_buffer;
     ssize_t bytes_received;
 
-    while ((bytes_received = recv(server_socket, &pword_buffer, sizeof(pword_buffer), 0)) > 0) {
+    while ((bytes_received = recv_all(server_socket, &pword_buffer, sizeof(pword_buffer))) > 0) {
         pword_buffer.col_words = ntohs(pword_buffer.col_words);
         prefix_tree_insert_word_with_col_words(main_tree, pword_buffer.word, pword_buffer.col_words);
         memset(&pword_buffer, 0, sizeof(pword_buffer));
