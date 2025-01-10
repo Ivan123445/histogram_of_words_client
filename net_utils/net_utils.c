@@ -59,7 +59,7 @@ void find_servers(char server_ips[][INET_ADDRSTRLEN], int *server_count) {
 
         strncpy(server_ips[*server_count], inet_ntoa(server_addr.sin_addr), INET_ADDRSTRLEN);
         (*server_count)++;
-        break;
+        // break;
     }
 
     close(sock);

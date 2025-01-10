@@ -94,7 +94,7 @@ int main(const int argc, char *argv[]) {
     printf("Splitting file..\n");
     long *file_parts = split_file(fileName, server_count);
 
-    printf("File spritted\n");
+    printf("File splitted\n");
     prefix_tree *result_tree = handle_file_parts_parallel(fileName, file_parts, server_count, server_ips);
     printf("Result tree:\n");
     prefix_tree_print(result_tree);
