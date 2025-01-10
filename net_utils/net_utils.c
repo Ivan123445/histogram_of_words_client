@@ -7,8 +7,6 @@ void find_servers(char server_ips[][INET_ADDRSTRLEN], int *server_count) {
     fd_set read_fds;
     struct timeval timeout;
 
-    *server_count = 0;
-
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
         perror("Socket creation failed");
@@ -48,18 +46,21 @@ void find_servers(char server_ips[][INET_ADDRSTRLEN], int *server_count) {
             continue;
         }
 
+        *server_count = 0;
+        for (int i = 0; i < sizeof(buffer); i++) {
+            if (buffer[i] == '|') {
+                if (i > 0) {
+                    (*server_count)++;
+                }
+                if (buffer[i + 1] == '|') {
+                    break;
+                }
+            } else {
+                server_ips[(*server_count)][i] = buffer[i];
+            }
+        }
 
-        // printf("Buffer: ");
-        // printf(buffer);
-        // char ip[INET_ADDRSTRLEN];
-        // while (())
-
-        buffer[received] = '\0';
-        printf("Received response: %s from %s\n", buffer, inet_ntoa(server_addr.sin_addr));
-
-        strncpy(server_ips[*server_count], inet_ntoa(server_addr.sin_addr), INET_ADDRSTRLEN);
-        (*server_count)++;
-        // break;
+        break;
     }
 
     close(sock);
