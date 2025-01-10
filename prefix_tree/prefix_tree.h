@@ -10,11 +10,11 @@
 #include "../file_scanner/file_scaner.h"
 
 #define MAX_WORD_LENGTH 20
-#define ALPHABET_SIZE 125
 
 typedef struct prefix_tree {
-    struct prefix_tree *children[ALPHABET_SIZE];
+    struct prefix_tree **childrens;
     char character;
+    unsigned short col_children;
     unsigned short words_here;
 } prefix_tree;
 
